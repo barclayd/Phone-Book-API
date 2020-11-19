@@ -9,7 +9,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Field, Int, ObjectType } from 'type-graphql';
-import { Contact } from '@/entity/Contact';
+import { Contact } from './Contact';
 
 @ObjectType()
 @Entity()

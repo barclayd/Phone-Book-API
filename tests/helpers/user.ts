@@ -1,7 +1,7 @@
-import { UserData } from '@t/models/user';
+import { LoginUser, UserData } from '@t/models/user';
 import faker from 'faker';
 import { setupGraphQL } from './setupGraphQL';
-import { registerMutation } from '@t/graphql/mutations/user';
+import { LoginMutation, registerMutation } from '@t/graphql/mutations/user';
 
 const randomNumber = (max = 9999999999999): number => {
   return Math.floor(Math.random() * Math.floor(max));
@@ -17,6 +17,13 @@ export const createRandomUser = (): UserData => ({
 export const registerUser = async (user: UserData) => {
   return await setupGraphQL({
     source: registerMutation,
+    variableValues: user,
+  });
+};
+
+export const loginUser = async (user: LoginUser) => {
+  return await setupGraphQL({
+    source: LoginMutation,
     variableValues: user,
   });
 };

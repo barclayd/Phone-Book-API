@@ -5,7 +5,7 @@ export interface UserData {
   lastName: string;
 }
 
-export interface UpdateUserDetailsData {
-  firstName: string | undefined;
-  lastName: string | undefined;
+export interface LoginUser {
+  email: string;
+  password: string;
 }

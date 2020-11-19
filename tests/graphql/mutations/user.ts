@@ -29,3 +29,17 @@ mutation UpdateUserDetails($firstName:String, $lastName:String) {
   updateUserDetails(firstName: $firstName, lastName: $lastName)
 }
 `;
+
+export const LoginMutation = `
+mutation LoginMutation($email:String!, $password:String!) {
+  login(email: $email, password: $password) {
+    user {
+      email
+      firstName
+      lastName
+      id
+    }
+    accessToken
+  }
+}
+`;

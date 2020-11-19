@@ -1,0 +1,9 @@
+FROM node:12.16.0-slim
+WORKDIR /usr/app
+COPY package*.json ./
+RUN npm install
+RUN npm i -g ts-node
+COPY . .
+ARG ACCESS_TOKEN_SECRET
+ARG REFRESH_TOKEN_SECRET
+RUN /usr/app/scripts/generateEnv.sh $ACCESS_TOKEN_SECRET $REFRESH_TOKEN_SECRET

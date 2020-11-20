@@ -3,7 +3,9 @@ import {
   Ctx,
   Field,
   InputType,
+  Int,
   Mutation,
+  ObjectType,
   Query,
   registerEnumType,
   Resolver,
@@ -16,6 +18,15 @@ import { findUserFromCtx } from '@/middleware/isAuth';
 import { AuthenticationError } from 'apollo-server-express';
 import { ContactErrorMessage } from '@/models/Error';
 import { getConnection } from 'typeorm';
+
+@ObjectType()
+class ContactsQuery {
+  @Field(() => [Contact])
+  contacts: Contact[];
+
+  @Field(() => Int)
+  count: number;
+}
 
 @InputType()
 class PhoneNumberInput {
@@ -109,10 +120,14 @@ export default class ContactResolver {
     }
   }
 
-  @Query(() => [Contact])
+  @Query(() => ContactsQuery)
   async contacts(
     @Arg('sortOrder', () => ContactSortOrder, { nullable: true })
     sortOrder: ContactSortOrder | undefined,
+    @Arg('skip', () => Number, { nullable: true })
+    skip: number | undefined,
+    @Arg('take', () => Number, { nullable: true })
+    take: number | undefined,
     @Ctx() context: Context,
   ) {
     const user = await findUserFromCtx(context);
@@ -120,22 +135,24 @@ export default class ContactResolver {
       throw new AuthenticationError(ContactErrorMessage.authenticationRequired);
     }
     const contactSortOrder = sortOrder ?? ContactSortOrder.ascending;
-    return await getConnection()
+    const contactsQuery = await getConnection()
       .createQueryBuilder(Contact, 'contact')
       .leftJoinAndSelect('contact.address', 'address')
       .leftJoinAndSelect('contact.phoneNumber', 'phoneNumber')
       .leftJoinAndSelect('contact.creator', 'creator')
       .where('contact.creator = :user', { user: user.id })
+      .skip(skip)
+      .take(take)
       .orderBy({
         'contact.lastName': contactSortOrder,
       })
-      .getMany();
-    // return Contact.find({
-    //   where: {
-    //     creator: user,
-    //   },
-    //   relations: ['address', 'phoneNumber', 'creator'],
-    // });
+      .getManyAndCount();
+
+    const [contacts, count] = contactsQuery;
+    return {
+      contacts,
+      count,
+    } as ContactsQuery;
   }
 
   @Mutation(() => Boolean)

@@ -23,6 +23,8 @@ import {
 } from '@/models/Error';
 import { getConnection } from 'typeorm';
 import { validateSync } from 'class-validator';
+import UserResolver from '@/resolvers/UserResolver';
+import faker from 'faker';
 
 @ObjectType()
 class ContactsQuery {
@@ -221,6 +223,53 @@ export default class ContactResolver {
       console.log(error);
       return false;
     }
+  }
+
+  private randomNumber = (max = 10000000000000): string => {
+    return String(Math.floor(Math.random() * Math.floor(max) + 10000000));
+  };
+
+  @Mutation(() => Boolean)
+  async mockData() {
+    const MAX_MOCK_USERS_TO_CREATE = 10;
+    const { accessToken } = await new UserResolver().register({
+      email: 'test@phonebookapi.com',
+      firstName: 'Scott',
+      lastName: 'Test',
+      password: 'test',
+    });
+    for (let i = 0; i < MAX_MOCK_USERS_TO_CREATE; i++) {
+      await this.createContact(
+        {
+          firstName: faker.name.firstName(),
+          lastName: faker.name.lastName(),
+          email: faker.internet.email(),
+          addresses: [
+            {
+              streetAddress: faker.address.streetAddress(),
+              postalTown: faker.address.city(),
+              postcode: faker.address.zipCode(),
+              country: faker.address.country(),
+            },
+          ],
+          phoneNumbers: [
+            {
+              value: this.randomNumber(),
+              type: PhoneNumberType.home,
+            },
+          ],
+        },
+        {
+          req: {
+            headers: {
+              authorization: `Bearer ${accessToken}`,
+            },
+            res: {} as any,
+          },
+        } as any,
+      );
+    }
+    return true;
   }
 
   @Mutation(() => Boolean)

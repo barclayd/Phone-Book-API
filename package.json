@@ -7,7 +7,7 @@
   "repository": "https://github.com/barclayd/Phone-Book-API",
   "scripts": {
     "start:dev": "NODE_ENV=development nodemon",
-    "setup:dev": "./scripts/setupDB.sh",
+    "setup:dev": "./scripts/setupDev.sh",
     "start:production": "NODE_ENV=production node dist/src/index.js",
     "reset:dev": "./scripts/resetDev.sh",
     "start:docker": "./scripts/setupDocker.sh",

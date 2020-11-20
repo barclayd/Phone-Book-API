@@ -1,0 +1,14 @@
+version: '3.7'
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: phonebook-api-test-dev
+    ports:
+      - '5432:5432'
+  web:
+    image: phonebook-api-test:latest
+    depends_on:
+      - db

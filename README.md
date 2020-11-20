@@ -70,4 +70,4 @@ npm run start:docker
 
 ### CI
 
-* GitHub Actions is in operation as a CI pipeline to verify the passing of unit and integration tests on each push in a PR branch to ``main``* GitHub Actions is in operation as a CI pipeline to verify the passing of unit and integration tests on each push in a PR branch to ``main``
+* GitHub Actions is in operation as a CI pipeline to verify the passing of unit and integration tests on each push in a PR branch to ``main``

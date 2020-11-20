@@ -1,10 +1,11 @@
 export enum UserErrorMessage {
-  alreadyConfirmed = 'Already confirmed',
-  invalidToken = 'Invalid token',
-  invalidOperation = 'Invalid operation',
   invalidCredentials = 'Invalid credentials',
   invalidDetails = 'Invalid details provided',
   nonUniqueEmail = 'Email already registered',
+}
+
+export enum ContactErrorMessage {
+  authenticationRequired = 'Must provide authentication to access contacts data',
 }
 
 export interface TypeOrmError {

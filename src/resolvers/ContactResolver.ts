@@ -1,7 +1,19 @@
-import { Arg, Field, InputType, Mutation, Query, Resolver } from 'type-graphql';
+import {
+  Arg,
+  Ctx,
+  Field,
+  InputType,
+  Mutation,
+  Query,
+  Resolver,
+} from 'type-graphql';
 import { PhoneNumber, PhoneNumberType } from '@/entity/PhoneNumber';
 import { Address } from '@/entity/Address';
 import { Contact } from '@/entity/Contact';
+import { Context } from '@/models/context';
+import { findUserFromCtx } from '@/middleware/isAuth';
+import { AuthenticationError } from 'apollo-server-express';
+import { ContactErrorMessage } from '@/models/Error';
 
 @InputType()
 class PhoneNumberInput {
@@ -44,10 +56,18 @@ export default class ContactResolver {
   @Mutation(() => Boolean)
   async createContact(
     @Arg('input') { email, addresses, phoneNumbers }: ContactRegistrationInput,
+    @Ctx() context: Context,
   ) {
     try {
+      const user = await findUserFromCtx(context);
+      if (!user) {
+        throw new AuthenticationError(
+          ContactErrorMessage.authenticationRequired,
+        );
+      }
       const contact = Contact.create({
         email,
+        creator: user,
       });
       contact.address =
         addresses?.map((address) => Address.create(address)) ?? [];
@@ -58,14 +78,21 @@ export default class ContactResolver {
       return true;
     } catch (error) {
       console.log(error);
-      return false;
+      throw error;
     }
   }
 
   @Query(() => [Contact])
-  contacts() {
+  async contacts(@Ctx() context: Context) {
+    const user = await findUserFromCtx(context);
+    if (!user) {
+      throw new AuthenticationError(ContactErrorMessage.authenticationRequired);
+    }
     return Contact.find({
-      relations: ['address', 'phoneNumber'],
+      where: {
+        creator: user,
+      },
+      relations: ['address', 'phoneNumber', 'creator'],
     });
   }
 

@@ -5,9 +5,11 @@ import {
   BaseEntity,
   UpdateDateColumn,
   CreateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { Field, ObjectType, registerEnumType } from 'type-graphql';
 import { MinLength, IsEmail } from 'class-validator';
+import { Contact } from '@/entity/Contact';
 
 export enum UserRoles {
   standard,
@@ -59,4 +61,8 @@ export class User extends BaseEntity {
 
   @Column({ type: 'enum', enum: UserRoles, default: UserRoles.standard })
   role: boolean;
+
+  @Field(() => [Contact])
+  @OneToMany(() => Contact, (contact) => contact.creator)
+  contacts: Contact[];
 }

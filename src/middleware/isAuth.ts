@@ -28,14 +28,6 @@ export const isApp = (req: Request): boolean => {
 export const refreshTokenDayLifetime = (req: Request): number =>
   isApp(req) ? 60 : 7;
 
-export const findUserFromCtxOrFail = async (context: Context) => {
-  const payload: any = findAndVerifyToken(context);
-  if (!payload) {
-    throw new Error('Could not verify token');
-  }
-  return await User.findOneOrFail(payload.userId);
-};
-
 export const findUserFromCtx = async (context: Context) => {
   try {
     const payload: any = findAndVerifyToken(context);

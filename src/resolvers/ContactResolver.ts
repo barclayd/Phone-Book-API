@@ -15,9 +15,14 @@ import { Address } from '@/entity/Address';
 import { Contact } from '@/entity/Contact';
 import { Context } from '@/models/context';
 import { findUserFromCtx } from '@/middleware/isAuth';
-import { AuthenticationError } from 'apollo-server-express';
-import { ContactErrorMessage } from '@/models/Error';
+import { AuthenticationError, ValidationError } from 'apollo-server-express';
+import {
+  ContactErrorMessage,
+  ErrorType,
+  PhoneNumberErrorMessage,
+} from '@/models/Error';
 import { getConnection } from 'typeorm';
+import { validateSync } from 'class-validator';
 
 @ObjectType()
 class ContactsQuery {
@@ -29,7 +34,7 @@ class ContactsQuery {
 }
 
 @InputType()
-class PhoneNumberInput {
+export class PhoneNumberInput {
   @Field()
   value: string;
 
@@ -94,6 +99,24 @@ registerEnumType(ContactSortOrder, {
 
 @Resolver()
 export default class ContactResolver {
+  public createPhoneNumber(input: PhoneNumberInput): PhoneNumber {
+    const phoneNumber = PhoneNumber.create(input);
+    const errors = validateSync(phoneNumber);
+    if (errors.length === 0) {
+      return phoneNumber;
+    }
+    const errorTypes = errors.map((error) =>
+      Object.keys(error.constraints as any),
+    )[0];
+    if (errorTypes.includes(ErrorType.stringOfNumbers)) {
+      throw new ValidationError(PhoneNumberErrorMessage.invalidNumber);
+    }
+    if (errorTypes.includes(ErrorType.minLength)) {
+      throw new ValidationError(PhoneNumberErrorMessage.insufficientLength);
+    }
+    throw new ValidationError(PhoneNumberErrorMessage.excessiveLength);
+  }
+
   @Mutation(() => Boolean)
   async createContact(
     @Arg('input')
@@ -122,8 +145,9 @@ export default class ContactResolver {
       contact.address =
         addresses?.map((address) => Address.create(address)) ?? [];
       contact.phoneNumber =
-        phoneNumbers?.map((phoneNumber) => PhoneNumber.create(phoneNumber)) ??
-        [];
+        phoneNumbers?.map((phoneNumber) =>
+          this.createPhoneNumber(phoneNumber),
+        ) ?? [];
       await contact.save();
       return true;
     } catch (error) {

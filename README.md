@@ -1,4 +1,4 @@
-# myFridge Server
+# PhoneBook API Server
 
 ![Server CI](https://github.com/barclayd/Phone-Book-API/workflows/Server%20CI/badge.svg?branch=main)
 

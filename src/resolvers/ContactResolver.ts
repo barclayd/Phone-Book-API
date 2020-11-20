@@ -83,8 +83,8 @@ class ContactRegistrationInput {
 }
 
 export enum ContactSortOrder {
-  ascending = 'ASC',
-  descending = 'DESC',
+  ASC = 'ASC',
+  DESC = 'DESC',
 }
 
 registerEnumType(ContactSortOrder, {
@@ -136,9 +136,9 @@ export default class ContactResolver {
   async contacts(
     @Arg('sortOrder', () => ContactSortOrder, { nullable: true })
     sortOrder: ContactSortOrder | undefined,
-    @Arg('skip', () => Number, { nullable: true })
+    @Arg('skip', () => Int, { nullable: true })
     skip: number | undefined,
-    @Arg('take', () => Number, { nullable: true })
+    @Arg('take', () => Int, { nullable: true })
     take: number | undefined,
     @Ctx() context: Context,
   ) {
@@ -146,7 +146,7 @@ export default class ContactResolver {
     if (!user) {
       throw new AuthenticationError(ContactErrorMessage.authenticationRequired);
     }
-    const contactSortOrder = sortOrder ?? ContactSortOrder.ascending;
+    const contactSortOrder = sortOrder ?? ContactSortOrder.ASC;
     const contactsQuery = await getConnection()
       .createQueryBuilder(Contact, 'contact')
       .leftJoinAndSelect('contact.address', 'address')

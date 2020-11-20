@@ -55,3 +55,9 @@ mutation CreateContactMutation($email: String!, $firstName: String!, $lastName: 
   })
 }
 `;
+
+export const DeleteContactMutation = `
+mutation DeleteContactMutation($id: Int!) {
+  deleteContact(id: $id)
+}
+`;

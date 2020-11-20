@@ -3,7 +3,7 @@ jest.setTimeout(30000);
 
 // @ts-ignore
 global.console = {
-  // silence console.logs() for tests
+  // silence console.logs() for tests when testing unhappy paths
   log: jest.fn(),
   // support showing the following in test output when specified in code or tests whilst debugging
   error: console.error,

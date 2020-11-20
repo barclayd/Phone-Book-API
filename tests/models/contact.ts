@@ -1,4 +1,5 @@
-import { PhoneNumberType } from '../../src/entity/PhoneNumber';
+import { PhoneNumberType } from '@/entity/PhoneNumber';
+import { ContactSortOrder } from '@/resolvers/ContactResolver';
 
 export interface ContactData extends AddressData {
   firstName: string;
@@ -17,4 +18,14 @@ export interface AddressData {
 export interface PhoneNumberData {
   value: string;
   type: PhoneNumberType;
+}
+
+export interface ContactOptions {
+  sortOrder?: ContactSortOrder;
+  take?: number;
+  skip?: number;
+}
+
+export interface ContactDeleteOptions {
+  id: number;
 }

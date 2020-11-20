@@ -53,6 +53,18 @@ class AddressInput {
 }
 
 @InputType()
+class ContactUpdateInput {
+  @Field({ nullable: true })
+  firstName?: string;
+
+  @Field({ nullable: true })
+  lastName?: string;
+
+  @Field({ nullable: true })
+  email?: string;
+}
+
+@InputType()
 class ContactRegistrationInput {
   @Field()
   firstName: string;
@@ -155,10 +167,42 @@ export default class ContactResolver {
     } as ContactsQuery;
   }
 
+  public buildUpdateObject(input: any) {
+    return Object.keys(input).reduce((acc, inputKey) => {
+      if (input[inputKey] !== undefined) {
+        acc = {
+          ...acc,
+          [inputKey]: input[inputKey],
+        };
+      }
+      return acc;
+    }, {});
+  }
+
   @Mutation(() => Boolean)
-  async deleteContact(@Arg('email') email: string) {
+  async updateContactById(
+    @Arg('id') id: number,
+    @Arg('input', () => ContactUpdateInput) input: ContactUpdateInput,
+  ) {
     try {
-      await Contact.delete({ email });
+      const updatedProperties = this.buildUpdateObject(input);
+      await getConnection()
+        .createQueryBuilder()
+        .update(Contact)
+        .set(updatedProperties)
+        .where('id = :id', { id })
+        .execute();
+      return true;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+  }
+
+  @Mutation(() => Boolean)
+  async deleteContact(@Arg('id', () => Int) id: number) {
+    try {
+      await Contact.delete(id);
       return true;
     } catch (error) {
       console.log(error);

@@ -17,7 +17,7 @@ COPY --from=build /usr/app/dist ./dist
 
 COPY ormconfig.js .
 COPY ./scripts/generateEnv.sh .
-COPY ./scripts/setupDB.sh .
+COPY ./scripts/setupDev.sh .
 RUN apt-get update
 RUN apt-get -y install curl
 ARG ACCESS_TOKEN_SECRET

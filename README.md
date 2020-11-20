@@ -143,3 +143,12 @@ npm run start:docker
 ### CI
 
 * GitHub Actions is in operation as a CI pipeline to verify the passing of unit and integration tests on each push in a PR branch to ``main``
+
+### Future Improvements
+
+If I had more time, I would implement the following:
+
+* Improved authorisation for all API calls
+* Improve range of testing for unhappy path
+* Implement a CD solution using GitHub actions to deploy server to production
+* Improve validation and sanitization of user input

@@ -24,12 +24,6 @@ export const registerMutation = `
 }
 `;
 
-export const updateUserDetailsMutation = `
-mutation UpdateUserDetails($firstName:String, $lastName:String) {
-  updateUserDetails(firstName: $firstName, lastName: $lastName)
-}
-`;
-
 export const LoginMutation = `
 mutation LoginMutation($email:String!, $password:String!) {
   login(email: $email, password: $password) {
@@ -41,5 +35,21 @@ mutation LoginMutation($email:String!, $password:String!) {
     }
     accessToken
   }
+}
+`;
+
+export const CreateContactMutation = `
+mutation CreateContactMutation($email: String!, $streetAddress: String!, $postalTown: String!, $postcode: String!, $country: String!) {
+  createContact(input: {
+    email: $email,
+    addresses: [
+    {
+        streetAddress: $streetAddress
+        postalTown: $postalTown,
+        postcode: $postcode,
+        country: $country
+      }
+    ]
+  })
 }
 `;

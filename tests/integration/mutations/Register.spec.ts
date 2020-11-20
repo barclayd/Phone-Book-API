@@ -5,7 +5,7 @@ import { verify } from 'jsonwebtoken';
 import { ExecutionResult } from 'graphql';
 import { UserData } from '@t/models/user';
 import { compare } from 'bcryptjs';
-import { createRandomUser, registerUser } from '@t/helpers/user';
+import { createUser, registerUser } from '@t/helpers/user';
 
 describe('UserResolver - Register Mutation', () => {
   let connection: Connection;
@@ -17,7 +17,7 @@ describe('UserResolver - Register Mutation', () => {
   });
 
   beforeEach(async () => {
-    randomUser = createRandomUser();
+    randomUser = createUser();
     createdUser = await registerUser(randomUser);
   });
 

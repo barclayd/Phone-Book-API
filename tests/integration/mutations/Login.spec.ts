@@ -1,7 +1,7 @@
 import { testConnection } from '@t/config/testDatabaseConnection';
 import { Connection } from 'typeorm';
 import { UserData } from '@t/models/user';
-import { createRandomUser, loginUser, registerUser } from '@t/helpers/user';
+import { createUser, loginUser, registerUser } from '@t/helpers/user';
 
 describe('UserResolver - Login Mutation', () => {
   let connection: Connection;
@@ -17,7 +17,7 @@ describe('UserResolver - Login Mutation', () => {
 
   describe('user logins in with valid email and password', () => {
     beforeEach(async () => {
-      createdUser = createRandomUser();
+      createdUser = createUser();
       await registerUser(createdUser);
     });
 

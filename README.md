@@ -39,7 +39,7 @@ This allows you to execute queries and mutations to read and update data in the 
 
 ### How to seed database with mock data via GraphQL playground
 
-Once the development server is running and launched, run the following command in GraphQL playground or execute the curl command below in ``terminal``
+Once the development server is running and launched, run the following command in GraphQL playground
 
 ```graphql
 mutation {
@@ -87,6 +87,8 @@ query ContactsQuery {
 You should now receive mock contacts retrieved from the database.
 
 ### How to seed database with mock data via terminal
+
+Once the development server is running and launched, run the following command in your ``command prompt`` or ``terminal``
 
 ```shell script
 curl 'http://localhost:4000/graphql' -H 'Accept-Encoding: gzip, deflate, br' -H 'Content-Type: application/json' -H 'Accept: application/json' -H 'Connection: keep-alive' -H 'DNT: 1' -H 'Origin: http://localhost:4000' --data-binary '{"query":"mutation {\n  mockData\n}\n"}' --compressed

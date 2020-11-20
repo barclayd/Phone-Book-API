@@ -39,9 +39,11 @@ mutation LoginMutation($email:String!, $password:String!) {
 `;
 
 export const CreateContactMutation = `
-mutation CreateContactMutation($email: String!, $streetAddress: String!, $postalTown: String!, $postcode: String!, $country: String!) {
+mutation CreateContactMutation($email: String!, $firstName: String!, $lastName: String!, $streetAddress: String!, $postalTown: String!, $postcode: String!, $country: String!) {
   createContact(input: {
     email: $email,
+    firstName: $firstName,
+    lastName: $lastName,
     addresses: [
     {
         streetAddress: $streetAddress

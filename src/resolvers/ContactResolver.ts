@@ -15,9 +15,16 @@ import { Address } from '@/entity/Address';
 import { Contact } from '@/entity/Contact';
 import { Context } from '@/models/context';
 import { findUserFromCtx } from '@/middleware/isAuth';
-import { AuthenticationError } from 'apollo-server-express';
-import { ContactErrorMessage } from '@/models/Error';
+import { AuthenticationError, ValidationError } from 'apollo-server-express';
+import {
+  ContactErrorMessage,
+  ErrorType,
+  PhoneNumberErrorMessage,
+} from '@/models/Error';
 import { getConnection } from 'typeorm';
+import { validateSync } from 'class-validator';
+import UserResolver from '@/resolvers/UserResolver';
+import faker from 'faker';
 
 @ObjectType()
 class ContactsQuery {
@@ -29,7 +36,7 @@ class ContactsQuery {
 }
 
 @InputType()
-class PhoneNumberInput {
+export class PhoneNumberInput {
   @Field()
   value: string;
 
@@ -94,6 +101,24 @@ registerEnumType(ContactSortOrder, {
 
 @Resolver()
 export default class ContactResolver {
+  public createPhoneNumber(input: PhoneNumberInput): PhoneNumber {
+    const phoneNumber = PhoneNumber.create(input);
+    const errors = validateSync(phoneNumber);
+    if (errors.length === 0) {
+      return phoneNumber;
+    }
+    const errorTypes = errors.map((error) =>
+      Object.keys(error.constraints as any),
+    )[0];
+    if (errorTypes.includes(ErrorType.stringOfNumbers)) {
+      throw new ValidationError(PhoneNumberErrorMessage.invalidNumber);
+    }
+    if (errorTypes.includes(ErrorType.minLength)) {
+      throw new ValidationError(PhoneNumberErrorMessage.insufficientLength);
+    }
+    throw new ValidationError(PhoneNumberErrorMessage.excessiveLength);
+  }
+
   @Mutation(() => Boolean)
   async createContact(
     @Arg('input')
@@ -122,8 +147,9 @@ export default class ContactResolver {
       contact.address =
         addresses?.map((address) => Address.create(address)) ?? [];
       contact.phoneNumber =
-        phoneNumbers?.map((phoneNumber) => PhoneNumber.create(phoneNumber)) ??
-        [];
+        phoneNumbers?.map((phoneNumber) =>
+          this.createPhoneNumber(phoneNumber),
+        ) ?? [];
       await contact.save();
       return true;
     } catch (error) {
@@ -197,6 +223,53 @@ export default class ContactResolver {
       console.log(error);
       return false;
     }
+  }
+
+  private randomNumber = (max = 10000000000000): string => {
+    return String(Math.floor(Math.random() * Math.floor(max) + 10000000));
+  };
+
+  @Mutation(() => Boolean)
+  async mockData() {
+    const MAX_MOCK_USERS_TO_CREATE = 10;
+    const { accessToken } = await new UserResolver().register({
+      email: 'test@phonebookapi.com',
+      firstName: 'Scott',
+      lastName: 'Test',
+      password: 'test',
+    });
+    for (let i = 0; i < MAX_MOCK_USERS_TO_CREATE; i++) {
+      await this.createContact(
+        {
+          firstName: faker.name.firstName(),
+          lastName: faker.name.lastName(),
+          email: faker.internet.email(),
+          addresses: [
+            {
+              streetAddress: faker.address.streetAddress(),
+              postalTown: faker.address.city(),
+              postcode: faker.address.zipCode(),
+              country: faker.address.country(),
+            },
+          ],
+          phoneNumbers: [
+            {
+              value: this.randomNumber(),
+              type: PhoneNumberType.home,
+            },
+          ],
+        },
+        {
+          req: {
+            headers: {
+              authorization: `Bearer ${accessToken}`,
+            },
+            res: {} as any,
+          },
+        } as any,
+      );
+    }
+    return true;
   }
 
   @Mutation(() => Boolean)

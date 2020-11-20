@@ -7,7 +7,7 @@ import {
   ManyToOne,
 } from 'typeorm';
 import { Field, Int, ObjectType, registerEnumType } from 'type-graphql';
-import { Validate } from 'class-validator';
+import { Validate, MinLength, MaxLength } from 'class-validator';
 import { isStringOfNumbers } from '@/validators/IsStringOfNumbers';
 import { Contact } from '@/entity/Contact';
 
@@ -33,6 +33,8 @@ export class PhoneNumber extends BaseEntity {
   @Field()
   @Column({ nullable: true })
   @Validate(isStringOfNumbers)
+  @MinLength(10)
+  @MaxLength(15)
   value: string;
 
   @Field(() => PhoneNumberType)

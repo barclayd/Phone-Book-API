@@ -39,9 +39,11 @@ mutation LoginMutation($email:String!, $password:String!) {
 `;
 
 export const CreateContactMutation = `
-mutation CreateContactMutation($email: String!, $streetAddress: String!, $postalTown: String!, $postcode: String!, $country: String!) {
+mutation CreateContactMutation($email: String!, $firstName: String!, $lastName: String!, $streetAddress: String!, $postalTown: String!, $postcode: String!, $country: String!) {
   createContact(input: {
     email: $email,
+    firstName: $firstName,
+    lastName: $lastName,
     addresses: [
     {
         streetAddress: $streetAddress
@@ -51,5 +53,11 @@ mutation CreateContactMutation($email: String!, $streetAddress: String!, $postal
       }
     ]
   })
+}
+`;
+
+export const DeleteContactMutation = `
+mutation DeleteContactMutation($id: Int!) {
+  deleteContact(id: $id)
 }
 `;

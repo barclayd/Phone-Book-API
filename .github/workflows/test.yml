@@ -1,0 +1,23 @@
+name: Server CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up docker
+        run: npm run start:docker $ACCESS_TOKEN_SECRET $REFRESH_TOKEN_SECRET
+        env:
+          ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
+          REFRESH_TOKEN_SECRET: ${{ secrets.REFRESH_TOKEN_SECRET }}
+      - name: Run Unit Tests
+        run: docker-compose run web npm run test:unit:ci
+      - name: Run Integration Tests
+        run: docker-compose run web npm run test:integration:ci

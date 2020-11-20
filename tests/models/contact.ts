@@ -1,6 +1,8 @@
 import { PhoneNumberType } from '../../src/entity/PhoneNumber';
 
 export interface ContactData extends AddressData {
+  firstName: string;
+  lastName: string;
   email: string;
   phoneNumbers?: PhoneNumberData;
 }

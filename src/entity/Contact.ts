@@ -22,9 +22,17 @@ export class Contact extends BaseEntity {
   id: number;
 
   @Field()
-  @Column({ unique: true })
+  @Column()
   @IsEmail()
   email: string;
+
+  @Field()
+  @Column()
+  firstName: string;
+
+  @Field()
+  @Column()
+  lastName: string;
 
   @CreateDateColumn({ type: 'timestamp' })
   @Field()

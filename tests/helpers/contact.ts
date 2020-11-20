@@ -8,6 +8,8 @@ export const randomNumber = (max = 9999999999999): number => {
 };
 
 export const generateContact = (): ContactData => ({
+  firstName: faker.name.firstName(),
+  lastName: faker.name.lastName(),
   email: `${faker.name.firstName()}${faker.name.lastName()}${randomNumber()}@test.com`,
   streetAddress: faker.address.streetAddress(),
   postalTown: faker.address.city(),

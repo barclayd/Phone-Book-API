@@ -5,6 +5,7 @@ import {
   InputType,
   Mutation,
   Query,
+  registerEnumType,
   Resolver,
 } from 'type-graphql';
 import { PhoneNumber, PhoneNumberType } from '@/entity/PhoneNumber';
@@ -14,6 +15,7 @@ import { Context } from '@/models/context';
 import { findUserFromCtx } from '@/middleware/isAuth';
 import { AuthenticationError } from 'apollo-server-express';
 import { ContactErrorMessage } from '@/models/Error';
+import { getConnection } from 'typeorm';
 
 @InputType()
 class PhoneNumberInput {
@@ -42,6 +44,12 @@ class AddressInput {
 @InputType()
 class ContactRegistrationInput {
   @Field()
+  firstName: string;
+
+  @Field()
+  lastName: string;
+
+  @Field()
   email: string;
 
   @Field(() => [PhoneNumberInput], { nullable: true })
@@ -51,11 +59,28 @@ class ContactRegistrationInput {
   addresses?: AddressInput[];
 }
 
+export enum ContactSortOrder {
+  ascending = 'ASC',
+  descending = 'DESC',
+}
+
+registerEnumType(ContactSortOrder, {
+  name: 'ContactSortOrder',
+  description: 'Supported sort options for contacts',
+});
+
 @Resolver()
 export default class ContactResolver {
   @Mutation(() => Boolean)
   async createContact(
-    @Arg('input') { email, addresses, phoneNumbers }: ContactRegistrationInput,
+    @Arg('input')
+    {
+      email,
+      addresses,
+      phoneNumbers,
+      firstName,
+      lastName,
+    }: ContactRegistrationInput,
     @Ctx() context: Context,
   ) {
     try {
@@ -67,6 +92,8 @@ export default class ContactResolver {
       }
       const contact = Contact.create({
         email,
+        firstName,
+        lastName,
         creator: user,
       });
       contact.address =
@@ -83,17 +110,32 @@ export default class ContactResolver {
   }
 
   @Query(() => [Contact])
-  async contacts(@Ctx() context: Context) {
+  async contacts(
+    @Arg('sortOrder', () => ContactSortOrder, { nullable: true })
+    sortOrder: ContactSortOrder | undefined,
+    @Ctx() context: Context,
+  ) {
     const user = await findUserFromCtx(context);
     if (!user) {
       throw new AuthenticationError(ContactErrorMessage.authenticationRequired);
     }
-    return Contact.find({
-      where: {
-        creator: user,
-      },
-      relations: ['address', 'phoneNumber', 'creator'],
-    });
+    const contactSortOrder = sortOrder ?? ContactSortOrder.ascending;
+    return await getConnection()
+      .createQueryBuilder(Contact, 'contact')
+      .leftJoinAndSelect('contact.address', 'address')
+      .leftJoinAndSelect('contact.phoneNumber', 'phoneNumber')
+      .leftJoinAndSelect('contact.creator', 'creator')
+      .where('contact.creator = :user', { user: user.id })
+      .orderBy({
+        'contact.lastName': contactSortOrder,
+      })
+      .getMany();
+    // return Contact.find({
+    //   where: {
+    //     creator: user,
+    //   },
+    //   relations: ['address', 'phoneNumber', 'creator'],
+    // });
   }
 
   @Mutation(() => Boolean)

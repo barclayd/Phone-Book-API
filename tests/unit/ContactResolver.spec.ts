@@ -106,7 +106,7 @@ describe('ContactResolver - createPhoneNumber', () => {
     }).toThrowError(expectedError);
   });
 
-  it('throws a ValidationError when createPhoneNumber is called with a value that is not a shorter than 10 characters in length', () => {
+  it('throws a MinLengthError when createPhoneNumber is called with a value that is not a shorter than 10 characters in length', () => {
     const type = PhoneNumberType.home;
     const value = '012334';
     const phoneNumberInput = new PhoneNumberInput();
@@ -120,7 +120,7 @@ describe('ContactResolver - createPhoneNumber', () => {
     }).toThrowError(expectedError);
   });
 
-  it('throws a ValidationError when createPhoneNumber is called with a value that is greater than 15 characters in length', () => {
+  it('throws a MaxLengthError when createPhoneNumber is called with a value that is greater than 15 characters in length', () => {
     const type = PhoneNumberType.home;
     const value = '0123345678910111213';
     const phoneNumberInput = new PhoneNumberInput();

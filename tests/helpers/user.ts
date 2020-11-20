@@ -3,11 +3,11 @@ import faker from 'faker';
 import { setupGraphQL } from './setupGraphQL';
 import { LoginMutation, registerMutation } from '@t/graphql/mutations/user';
 
-const randomNumber = (max = 9999999999999): number => {
+export const randomNumber = (max = 9999999999999): number => {
   return Math.floor(Math.random() * Math.floor(max));
 };
 
-export const createRandomUser = (): UserData => ({
+export const createUser = (): UserData => ({
   email: `${faker.name.firstName()}${faker.name.lastName()}${randomNumber()}@test.com`,
   password: faker.internet.password(4),
   firstName: faker.name.firstName(),

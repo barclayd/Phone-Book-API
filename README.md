@@ -140,6 +140,19 @@ npm run generate:schema
 npm run start:docker
 ```
 
+### How to run unit tests in Docker using DockerCompose
+
+```shell script
+docker-compose run web npm run test:unit:ci
+```
+
+
+### How to run integration tests in Docker using DockerCompose
+
+```shell script
+docker-compose run web npm run test:integration:ci
+```
+
 ### How to close Docker Compose
 
 ```shell script

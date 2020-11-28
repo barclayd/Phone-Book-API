@@ -140,6 +140,12 @@ npm run generate:schema
 npm run start:docker
 ```
 
+### How to close Docker Compose
+
+```shell script
+docker-compose down
+```
+
 ### CI
 
 * GitHub Actions is in operation as a CI pipeline to verify the passing of unit and integration tests on each push in a PR branch to ``main``
